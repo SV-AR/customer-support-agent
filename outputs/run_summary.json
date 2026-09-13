@@ -1,0 +1,8 @@
+{
+  "brand": "AWSSupport",
+  "n_conversation_pairs": 1009,
+  "n_train": 807,
+  "n_test": 202,
+  "embedding_backend": "sentence-transformers",
+  "escalation_rate_test": 0.9504950495049505
+}

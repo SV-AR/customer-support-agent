@@ -1,0 +1,4 @@
+data/twcs.csv
+.venv/
+__pycache__/
+*.py[cod]

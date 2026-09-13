@@ -1,0 +1,17 @@
+{
+  "raw_data_path": "data/twcs.csv",
+  "sample_data_path": "data/sample_twcs.csv",
+  "brand_author_id": "AppleSupport",
+  "min_conversation_turns": 2,
+  "random_seed": 42,
+  "n_intent_clusters": 8,
+  "embedding_model_name": "all-MiniLM-L6-v2",
+  "tfidf_max_features": 5000,
+  "test_size": 0.2,
+  "faiss_top_k": 5,
+  "llm_model_name": "gpt-4o-mini",
+  "use_live_llm": false,
+  "golden_sample_size": 200,
+  "outputs_dir": "outputs",
+  "reports_dir": "reports"
+}

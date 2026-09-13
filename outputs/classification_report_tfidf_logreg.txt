@@ -1,0 +1,14 @@
+                       precision    recall  f1-score   support
+
+      Billing Problem       0.62      0.53      0.57        15
+  Cluster_0_(support)       0.48      0.50      0.49        30
+Cluster_2_(available)       0.46      0.54      0.50        24
+      Cluster_4_(aws)       0.54      0.47      0.50        32
+      Cluster_5_(aws)       0.61      0.67      0.64        33
+   Cluster_6_(lambda)       0.78      0.70      0.74        10
+     Cluster_7_(link)       0.62      0.57      0.60        40
+       Password Reset       0.50      0.56      0.53        18
+
+             accuracy                           0.56       202
+            macro avg       0.58      0.57      0.57       202
+         weighted avg       0.56      0.56      0.56       202

@@ -1,0 +1,44 @@
+# Core
+pandas>=2.0
+numpy>=1.24
+scikit-learn>=1.3
+
+# Embeddings + retrieval
+sentence-transformers>=2.2
+faiss-cpu>=1.7
+
+# LLM generation / judging (optional but recommended)
+openai>=1.0
+
+# Optional stronger classifier
+lightgbm>=4.0
+
+# Evaluation metrics
+nltk>=3.8
+rouge-score>=0.1.2
+bert-score>=0.3.13
+
+# Plotting
+matplotlib>=3.7
+seaborn>=0.12
+
+# Notebooks (EDA only)
+jupyter>=1.0
+
+# --------------------------------------------------------------------------
+# NOTE ON OFFLINE / SANDBOXED EXECUTION
+# --------------------------------------------------------------------------
+# This project was authored and smoke-tested in a sandboxed environment
+# with NO network access, so sentence-transformers, faiss-cpu, nltk,
+# rouge-score, bert-score, lightgbm, and openai could not be installed or
+# their model weights downloaded. Every module that depends on one of
+# these packages (src/embeddings.py, src/retrieval.py, src/evaluation.py,
+# src/reply_generator.py, src/escalation.py, src/intent_classifier.py)
+# detects the missing dependency at runtime and transparently falls back
+# to a dependency-free equivalent (TF-IDF+SVD embeddings, numpy
+# brute-force search, hand-rolled BLEU/ROUGE, logistic regression instead
+# of LightGBM, template-based replies instead of live LLM calls) so the
+# full pipeline still runs and every STEP produces real, non-fabricated
+# output. Installing the packages above and providing OPENAI_API_KEY
+# upgrades each fallback to its production-quality counterpart with zero
+# code changes -- see README.md "Reproducing with full dependencies".

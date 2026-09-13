@@ -1,0 +1,4 @@
+{
+  "cohens_kappa": null,
+  "note": "Requires human-labeled golden_eval_annotation_sheet.csv; see README STEP 7."
+}
