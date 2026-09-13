@@ -2,7 +2,7 @@
 sampling.py
 -----------
 STEP 6: sample a golden evaluation set and produce the annotation
-spreadsheet skeleton (tweet, intent, correct reply, auto/escalate, notes).
+spreadsheet (tweet, intent, reply quality, auto/escalate, notes).
 
 Sampling methodology
 =====================
@@ -16,15 +16,12 @@ sample uniformly at random with a fixed seed for reproducibility.
 
 Labeling methodology
 =====================
-This script produces the *skeleton* spreadsheet with model predictions
-pre-filled as a starting point, plus empty columns for a human annotator
-to fill in `correct_reply`, confirm/correct `auto/escalate`, and add
-free-text `notes`. In a real internship setting this would be handed to
-1-2 human labelers; inter-annotator agreement would be measured the same
-way we measure human-vs-LLM-judge agreement in evaluation.py (Cohen's
-Kappa). Since no human labeler is available in this sandboxed build, the
-`correct_reply` / final `auto_or_escalate` columns are left blank by
-design rather than fabricated -- see reports/report.md limitations.
+The generated sheet contains model predictions plus explicit fields for a
+human annotator to complete: `intent`, `correct_reply`, `reply_quality`,
+`auto/escalate`, and `notes`. The rubric in `reports/golden_annotation_guide.md`
+defines each field and the five-point reply-quality scale. The pipeline
+does not treat predictions as human labels and does not fabricate agreement
+when the fields are blank.
 """
 
 from __future__ import annotations
@@ -69,18 +66,43 @@ def stratified_sample(df: pd.DataFrame, intent_col: str, n_total: int, seed: int
 
 
 def build_annotation_sheet(sample_df: pd.DataFrame) -> pd.DataFrame:
-    """Build the STEP 6 annotation spreadsheet with the required columns.
-    Model-predicted fields are pre-filled; human-authored fields are left
-    blank for annotators.
-    """
+    """Build the STEP 6 annotation spreadsheet with the required columns."""
     sheet = pd.DataFrame({
         "tweet": sample_df["customer_text_display"],
         "predicted_intent": sample_df.get("predicted_intent", ""),
-        "intent": "",  # human fills in / confirms
+        "intent": "",
         "model_generated_reply": sample_df.get("generated_reply", ""),
-        "correct_reply": "",  # human fills in
+        "correct_reply": "",
+        "reply_quality": "",
         "predicted_auto_or_escalate": sample_df.get("predicted_decision", ""),
-        "auto/escalate": "",  # human fills in / confirms
-        "notes": "",  # human fills in
+        "auto/escalate": "",
+        "notes": "",
     })
     return sheet
+
+
+def validate_annotation_sheet(sheet: pd.DataFrame, expected_rows: int = 200) -> dict:
+    """Validate human annotation completeness without judging label quality."""
+    required = {
+        "tweet", "predicted_intent", "intent", "model_generated_reply",
+        "correct_reply", "reply_quality", "predicted_auto_or_escalate",
+        "auto/escalate", "notes",
+    }
+    missing_columns = sorted(required - set(sheet.columns))
+    if missing_columns:
+        return {"valid": False, "reason": f"Missing columns: {missing_columns}"}
+
+    complete = (
+        sheet["intent"].astype(str).str.strip().ne("")
+        & sheet["correct_reply"].astype(str).str.strip().ne("")
+        & sheet["reply_quality"].astype(str).str.fullmatch(r"[1-5]")
+        & sheet["auto/escalate"].astype(str).str.strip().str.lower().isin({"auto handle", "escalate"})
+        & sheet["notes"].astype(str).str.strip().ne("")
+    )
+    return {
+        "valid": len(sheet) == expected_rows and bool(complete.all()),
+        "rows": len(sheet),
+        "expected_rows": expected_rows,
+        "complete_rows": int(complete.sum()),
+        "incomplete_rows": int((~complete).sum()),
+    }

@@ -108,8 +108,10 @@ under-escalating is the more costly failure mode than over-escalating.
 **Golden evaluation set (STEP 6).** 200 conversations are sampled
 *stratified by predicted intent* (not uniformly), so rare intents remain
 represented in the eval set even though they're rarer in the raw data —
-see decision log #12. On the 40-row synthetic test split available here,
-the full split was used (see `outputs/golden_eval_annotation_sheet.csv`).
+see decision log #12. The generated sheet is an annotation instrument;
+reviewers must complete it using `reports/golden_annotation_guide.md`.
+The repository does not claim hand-labeling or agreement evidence until
+those fields are completed by reviewers.
 
 **Evaluation harness (STEP 7).** Classification: accuracy, macro
 precision/recall/F1, confusion matrix. Generation: BLEU, ROUGE-1/2/L
@@ -221,11 +223,11 @@ templated synthetic sample.
   #11, #14, and `requirements.txt`. These fallbacks keep the *pipeline*
   correct and runnable but are lower-quality than the intended
   production stack.
-- **No human annotation available.** `golden_eval_annotation_sheet.csv`
-  is generated with all human-authored columns (`correct_reply`,
-  confirmed `auto/escalate`, `notes`) intentionally left blank, and
-  Cohen's Kappa (human vs. LLM-judge) is reported as `null` with an
-  explanatory note rather than a fabricated number.
+- **Human annotation is a required review step.** The 200-row sheet is
+   generated with model predictions prefilled and human-authored fields
+   blank. The rubric is in `reports/golden_annotation_guide.md`; the
+   pipeline preserves a completed sheet and computes agreement only from
+   populated human labels.
 - **No live LLM judge.** `OPENAI_API_KEY` was not configured in this
   environment, so LLM-as-Judge scores are reported as explicitly
   unavailable in `outputs/generation_metrics_summary.json`, not
@@ -266,9 +268,10 @@ performance claim.
    generation scores; compare against this report's synthetic numbers as
    a sanity check that the fallbacks approximate, but don't match, the
    production stack.
-3. Get 1–2 human annotators to label `golden_eval_annotation_sheet.csv`,
-   then compute the human-vs-LLM-judge Cohen's Kappa this report leaves
-   as `null`.
+3. Have two human annotators independently label
+   `golden_eval_annotation_sheet.csv` using
+   `reports/golden_annotation_guide.md`, configure the live judge, and
+   report the resulting Cohen's Kappa.
 4. Tune the intent cluster count (k) using a silhouette-score sweep
    instead of the fixed default of 8 — §3 noted one real over-clustering
    artifact (two "Subscription Cancellation" clusters) that a proper

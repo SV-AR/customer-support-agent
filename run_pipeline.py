@@ -268,10 +268,23 @@ def main(config: Config | None = None) -> None:
     golden_sample = sampling.stratified_sample(
         test_df, intent_col="predicted_intent", n_total=config.golden_sample_size, seed=config.random_seed,
     )
-    annotation_sheet = sampling.build_annotation_sheet(golden_sample)
-    annotation_sheet.to_csv(out_dir / "golden_eval_annotation_sheet.csv", index=False)
-    logger.info("Golden annotation sheet written with %d rows (human annotation columns left "
-                "blank by design -- see reports/report.md limitations).", len(annotation_sheet))
+    annotation_path = out_dir / "golden_eval_annotation_sheet.csv"
+    if annotation_path.exists():
+        existing_sheet = pd.read_csv(annotation_path)
+        required_columns = {"tweet", "intent", "correct_reply", "reply_quality", "auto/escalate", "notes"}
+        if len(existing_sheet) == len(golden_sample) and required_columns.issubset(existing_sheet.columns):
+            annotation_sheet = existing_sheet
+            logger.info("Reusing existing golden annotation sheet; human labels will not be overwritten.")
+        else:
+            annotation_sheet = sampling.build_annotation_sheet(golden_sample)
+            annotation_sheet.to_csv(annotation_path, index=False)
+            logger.info("Golden annotation sheet regenerated with %d rows; complete it using "
+                        "reports/golden_annotation_guide.md.", len(annotation_sheet))
+    else:
+        annotation_sheet = sampling.build_annotation_sheet(golden_sample)
+        annotation_sheet.to_csv(annotation_path, index=False)
+        logger.info("Golden annotation sheet written with %d rows; complete it using "
+                    "reports/golden_annotation_guide.md.", len(annotation_sheet))
 
     # ------------------------------------------------------------------ #
     # STEP 7: Evaluation harness -- generation metrics + LLM judge + kappa
@@ -321,12 +334,31 @@ def main(config: Config | None = None) -> None:
     save_json(generation_summary, out_dir / "generation_metrics_summary.json")
     logger.info("Generation metrics summary: %s", json.dumps(generation_summary, indent=2, default=str))
 
-    # Cohen's Kappa: requires human labels, which don't exist until the
-    # golden_eval_annotation_sheet.csv is hand-labeled. Documented, not faked.
-    kappa = evaluation.cohens_kappa(human_labels=[], llm_labels=[])
-    save_json({"cohens_kappa": kappa,
-               "note": "Requires human-labeled golden_eval_annotation_sheet.csv; see README STEP 7."},
-              out_dir / "human_llm_agreement.json")
+    human_labels, llm_labels = [], []
+    if judge_scores_available and "reply_quality" in annotation_sheet.columns:
+        for raw_human, raw_judge in zip(annotation_sheet["reply_quality"], gen_rows):
+            try:
+                human_label = int(raw_human)
+            except (TypeError, ValueError):
+                continue
+            judge_payload = json.loads(raw_judge["llm_judge"]) if raw_judge["llm_judge"] else None
+            judge_label = evaluation.judge_quality_label(judge_payload) if judge_payload else None
+            if judge_label is not None and 1 <= human_label <= 5:
+                human_labels.append(human_label)
+                llm_labels.append(judge_label)
+    kappa = evaluation.cohens_kappa(human_labels, llm_labels)
+    agreement_payload = {
+        "cohens_kappa": kappa,
+        "n_compared": len(human_labels),
+        "human_label_field": "reply_quality",
+        "judge_label": "rounded mean of correctness, helpfulness, groundedness, tone_consistency, safety",
+    }
+    if kappa is None:
+        agreement_payload["note"] = (
+            "Agreement is unavailable until the 200-row sheet is completed and a live LLM judge "
+            "run is performed. See reports/golden_annotation_guide.md."
+        )
+    save_json(agreement_payload, out_dir / "human_llm_agreement.json")
 
     # ------------------------------------------------------------------ #
     # STEP 8: Failure analysis

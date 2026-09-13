@@ -253,6 +253,15 @@ def cohens_kappa(human_labels: list, llm_labels: list) -> float | None:
     return cohen_kappa_score(human_labels, llm_labels)
 
 
+def judge_quality_label(judge_score: dict) -> int | None:
+    """Convert the five rubric scores into one reproducible quality label."""
+    criteria = ["correctness", "helpfulness", "groundedness", "tone_consistency", "safety"]
+    values = [judge_score.get(key) for key in criteria]
+    if any(not isinstance(value, (int, float)) or not 1 <= value <= 5 for value in values):
+        return None
+    return int(round(float(np.mean(values))))
+
+
 # --------------------------------------------------------------------------- #
 # 5. Failure analysis
 # --------------------------------------------------------------------------- #

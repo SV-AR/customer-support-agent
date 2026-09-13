@@ -1,13 +1,13 @@
 {
   "n_examples": 200,
-  "bleu_mean": 0.030983607297087955,
-  "rouge1_mean": 0.19649974049395047,
-  "rouge2_mean": 0.04908603612102349,
-  "rougeL_mean": 0.16559213980280008,
+  "bleu_mean": 0.03126785571001138,
+  "rouge1_mean": 0.17843276368653327,
+  "rouge2_mean": 0.04438242636406096,
+  "rougeL_mean": 0.1483441974726536,
   "bertscore": {
-    "precision": 0.8729698061943054,
-    "recall": 0.8721176385879517,
-    "f1": 0.8724349737167358
+    "precision": 0.8685504794120789,
+    "recall": 0.8687440752983093,
+    "f1": 0.8685423135757446
   },
   "llm_judge_scores_available": false,
   "llm_judge_note": "No OPENAI_API_KEY configured in this environment, so LLM-as-Judge scores are NOT computed and are reported as unavailable rather than fabricated. Set OPENAI_API_KEY and Config.use_live_llm=True to populate this section."

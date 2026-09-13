@@ -1,67 +1,67 @@
 # Top Failure Modes -- AWSSupport Intent Classifier
 
-## Failure 1: Cluster_0_(support) -> predicted Cluster_7_(link)
+## Failure 1: Cluster_5_(aws) -> predicted Cluster_4_(ec2)
 
-**Example:** @123644 Node LTS Carbon, plz.
+**Example:** @123644 @AWSSupport we're getting various API errors in eu-central (s3 timeouts, ec2 inconsistent responses, web gui hiccups, ie. it shows deleted resources or timeouts). There's nothing on status page, all green.
 
-**Prediction:** Cluster_7_(link)  
-**Expected:** Cluster_0_(support)
+**Prediction:** Cluster_4_(ec2)  
+**Expected:** Cluster_5_(aws)
 
-**Why it failed:** 'Cluster_0_(support)' and 'Cluster_7_(link)' share overlapping vocabulary (3 such confusions in the eval set), suggesting the model relies on surface keywords rather than deeper intent semantics.
+**Why it failed:** 'Cluster_5_(aws)' and 'Cluster_4_(ec2)' share overlapping vocabulary (2 such confusions in the eval set), suggesting the model relies on surface keywords rather than deeper intent semantics.
 
-**Possible fix:** Add more contrastive training examples that distinguish 'Cluster_0_(support)' from 'Cluster_7_(link)', or add a rule-based tiebreaker for their most confusable keywords.
-
----
-
-## Failure 2: Cluster_7_(link) -> predicted Cluster_0_(support)
-
-**Example:** @123644 I can't submit support tickets for technical issues sooo... here you go. API Gateway won't let me configure... APIs...
-
-**Prediction:** Cluster_0_(support)  
-**Expected:** Cluster_7_(link)
-
-**Why it failed:** 'Cluster_7_(link)' and 'Cluster_0_(support)' share overlapping vocabulary (3 such confusions in the eval set), suggesting the model relies on surface keywords rather than deeper intent semantics.
-
-**Possible fix:** Add more contrastive training examples that distinguish 'Cluster_7_(link)' from 'Cluster_0_(support)', or add a rule-based tiebreaker for their most confusable keywords.
+**Possible fix:** Add more contrastive training examples that distinguish 'Cluster_5_(aws)' from 'Cluster_4_(ec2)', or add a rule-based tiebreaker for their most confusable keywords.
 
 ---
 
-## Failure 3: Password Reset -> predicted Cluster_7_(link)
+## Failure 2: Cluster_5_(aws) -> predicted Cluster_6_(link)
 
-**Example:** @AWSSupport Hi, Your Win Beenstalk create is broke. Tried to let you know via support ticket but have to pay extra to go that route aprntly.
+**Example:** @awssupport please if you have a link on how to use amazon ssl for a ghost blog hosted on aws thank you
 
-**Prediction:** Cluster_7_(link)  
-**Expected:** Password Reset
+**Prediction:** Cluster_6_(link)  
+**Expected:** Cluster_5_(aws)
 
-**Why it failed:** 'Password Reset' and 'Cluster_7_(link)' share overlapping vocabulary (3 such confusions in the eval set), suggesting the model relies on surface keywords rather than deeper intent semantics.
+**Why it failed:** 'Cluster_5_(aws)' and 'Cluster_6_(link)' share overlapping vocabulary (2 such confusions in the eval set), suggesting the model relies on surface keywords rather than deeper intent semantics.
 
-**Possible fix:** Add more contrastive training examples that distinguish 'Password Reset' from 'Cluster_7_(link)', or add a rule-based tiebreaker for their most confusable keywords.
-
----
-
-## Failure 4: Cluster_4_(aws) -> predicted Cluster_5_(aws)
-
-**Example:** @123644 it takes too long for resources to be deleted! Created an S3 bucket in the wrong region and now I'm sitting here paying for it :/
-
-**Prediction:** Cluster_5_(aws)  
-**Expected:** Cluster_4_(aws)
-
-**Why it failed:** 'Cluster_4_(aws)' and 'Cluster_5_(aws)' share overlapping vocabulary (1 such confusions in the eval set), suggesting the model relies on surface keywords rather than deeper intent semantics.
-
-**Possible fix:** Add more contrastive training examples that distinguish 'Cluster_4_(aws)' from 'Cluster_5_(aws)', or add a rule-based tiebreaker for their most confusable keywords.
+**Possible fix:** Add more contrastive training examples that distinguish 'Cluster_5_(aws)' from 'Cluster_6_(link)', or add a rule-based tiebreaker for their most confusable keywords.
 
 ---
 
-## Failure 5: Cluster_6_(lambda) -> predicted Cluster_7_(link)
+## Failure 3: Cluster_5_(aws) -> predicted Password Reset
 
-**Example:** The @123644 docs are also misleading; if you use pip3, you need that path. Lots of mucking around :(
+**Example:** @123644 Unable to sign into any root account. Clicking “Sign-in using root account credentials” prompts for account ID followed by asking for `IAM` user name. Nowhere to enter root email. Seeing across multiple browsers.
 
-**Prediction:** Cluster_7_(link)  
-**Expected:** Cluster_6_(lambda)
+**Prediction:** Password Reset  
+**Expected:** Cluster_5_(aws)
 
-**Why it failed:** 'Cluster_6_(lambda)' and 'Cluster_7_(link)' share overlapping vocabulary (1 such confusions in the eval set), suggesting the model relies on surface keywords rather than deeper intent semantics.
+**Why it failed:** 'Cluster_5_(aws)' and 'Password Reset' share overlapping vocabulary (2 such confusions in the eval set), suggesting the model relies on surface keywords rather than deeper intent semantics.
 
-**Possible fix:** Add more contrastive training examples that distinguish 'Cluster_6_(lambda)' from 'Cluster_7_(link)', or add a rule-based tiebreaker for their most confusable keywords.
+**Possible fix:** Add more contrastive training examples that distinguish 'Cluster_5_(aws)' from 'Password Reset', or add a rule-based tiebreaker for their most confusable keywords.
+
+---
+
+## Failure 4: Cluster_3_(help) -> predicted Cluster_4_(ec2)
+
+**Example:** @AWSSupport EC2 RunInstance with TagSpecifications actually requires CreateTags too. Neither of Policy generator and simulator may not help for it.
+
+**Prediction:** Cluster_4_(ec2)  
+**Expected:** Cluster_3_(help)
+
+**Why it failed:** 'Cluster_3_(help)' and 'Cluster_4_(ec2)' share overlapping vocabulary (1 such confusions in the eval set), suggesting the model relies on surface keywords rather than deeper intent semantics.
+
+**Possible fix:** Add more contrastive training examples that distinguish 'Cluster_3_(help)' from 'Cluster_4_(ec2)', or add a rule-based tiebreaker for their most confusable keywords.
+
+---
+
+## Failure 5: Cluster_5_(aws) -> predicted Cluster_3_(help)
+
+**Example:** @AWSSupport - I am trying to assist someone set up the AWS account with email __email__. The address in in South Sudan. We see this error
+
+**Prediction:** Cluster_3_(help)  
+**Expected:** Cluster_5_(aws)
+
+**Why it failed:** 'Cluster_5_(aws)' and 'Cluster_3_(help)' share overlapping vocabulary (1 such confusions in the eval set), suggesting the model relies on surface keywords rather than deeper intent semantics.
+
+**Possible fix:** Add more contrastive training examples that distinguish 'Cluster_5_(aws)' from 'Cluster_3_(help)', or add a rule-based tiebreaker for their most confusable keywords.
 
 ---
 

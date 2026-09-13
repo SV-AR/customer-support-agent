@@ -1,4 +1,7 @@
 {
   "cohens_kappa": null,
-  "note": "Requires human-labeled golden_eval_annotation_sheet.csv; see README STEP 7."
+  "n_compared": 0,
+  "human_label_field": "reply_quality",
+  "judge_label": "rounded mean of correctness, helpfulness, groundedness, tone_consistency, safety",
+  "note": "Agreement is unavailable until the 200-row sheet is completed and a live LLM judge run is performed. See reports/golden_annotation_guide.md."
 }

@@ -26,7 +26,7 @@ dataset.
 ### 1. Installation
 
 ```bash
-git clone <this-repo>
+git clone https://github.com/SV-AR/customer-support-agent.git
 cd customer-support-agent
 python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
@@ -77,7 +77,8 @@ many conversations you keep after brand filtering).
 | `outputs/model_comparison.csv` / `.png` | STEP 3/9: random vs TF-IDF vs embedding classifier |
 | `outputs/confusion_matrix_embedding_classifier.png` | STEP 3 |
 | `outputs/test_predictions_full.csv` | Per-example intent, generated reply, escalation decision |
-| `outputs/golden_eval_annotation_sheet.csv` | STEP 6: spreadsheet for human annotation |
+| `outputs/golden_eval_annotation_sheet.csv` | STEP 6: 200-row spreadsheet for human annotation |
+| `reports/golden_annotation_guide.md` | Annotation rubric and agreement protocol |
 | `outputs/generation_metrics_summary.json` | STEP 7: BLEU / ROUGE / BERTScore / LLM-judge availability |
 | `outputs/failure_analysis.md` | STEP 8: top failure modes with cause + fix |
 | `reports/report.md` | STEP 10: 6-page write-up |
@@ -93,6 +94,16 @@ Then in `run_pipeline.py`, set `Config(use_live_llm=True)`. Without a
 key, reply generation uses a deterministic, style-matched template
 fallback (see `src/reply_generator.py`) and LLM-judge scores are
 reported as explicitly unavailable rather than fabricated.
+
+### 6. Complete the golden evaluation
+
+The pipeline samples 200 examples by predicted-intent stratum and writes a
+review sheet. Have two reviewers independently complete `intent`,
+`correct_reply`, `reply_quality`, `auto/escalate`, and `notes` using
+`reports/golden_annotation_guide.md`. Re-running the pipeline preserves a
+complete sheet rather than overwriting it. With `OPENAI_API_KEY` configured
+and `Config(use_live_llm=True)`, the pipeline runs the judge and writes the
+human-versus-judge Cohen's Kappa to `outputs/human_llm_agreement.json`.
 
 ---
 
@@ -148,11 +159,10 @@ numbers that should be quoted in any evaluation of this project.
 - `sentence-transformers`, `faiss-cpu`, `nltk`, `rouge-score`,
   `bert-score`, `lightgbm`, `openai` were not installable → dependency-free
   fallbacks used automatically, logged clearly at runtime.
-- Golden evaluation sheet (`golden_eval_annotation_sheet.csv`) is
-  generated but **not hand-labeled** (no human annotator available in
-  this environment) → `correct_reply`, final `auto/escalate`, and
-  `notes` columns are intentionally blank, and Cohen's Kappa is reported
-  as `null` with an explanatory note rather than a fabricated value.
+- The checked-in golden evaluation sheet is an annotation instrument until
+  two human reviewers complete it. Blank human fields are never treated as
+  labels, and Cohen's Kappa remains `null` until both human labels and live
+  LLM-judge outputs exist.
 - LLM-as-Judge scores require `OPENAI_API_KEY`; without it,
   `generation_metrics_summary.json` reports `llm_judge_scores_available: false`
   with an explanatory note instead of invented scores.
